@@ -4,7 +4,8 @@
         "outDir": "./build",
         "target": "es5",
         "noImplicitAny": false,
-        "sourceMap": false
+        "sourceMap": false,
+        "esModuleInterop": true
     },
     "exclude": [
         "node_modules"

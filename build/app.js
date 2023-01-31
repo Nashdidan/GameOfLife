@@ -1,10 +1,14 @@
 "use strict";
-var express = require('express');
-var app = express();
-var port = 3000;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = __importDefault(require("express"));
+var app = (0, express_1.default)();
+var port = '3000';
 app.get('/', function (req, res) {
-    res.send('Hello World!');
+    res.send('Express + TypeScript Server');
 });
 app.listen(port, function () {
-    console.log("Example app listening on port " + port);
+    console.log("\u26A1\uFE0F[server]: Server is running at http://localhost:".concat(port));
 });
