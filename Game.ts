@@ -11,56 +11,76 @@ class Board{
 
 class Cell{
     is_alive: Boolean = true
+    next_state: boolean
     is_dirty: Boolean = false
     coordinate: Coordinate
-    neigbers
+    living_neigbers: number
+}
+
+const coordinateEq = (a: Coordinate, b: Coordinate) => {
+    return a.x === b.x && a.y === b.y
 }
 
 class Game {
-    boardStates: Board[]
-    gameResolution = {x: 10, y: 10}
+    board: Board
+    gameResolution = {x: 3, y: 3}
     offset = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
 
-    nextGeneration(board: Board) {
-        this.boardStates.push(board)
-        const neigberhood: Coordinate[] = []
+    nextGeneration() {
         // const birthCandidates: {[p: Coordinate]: number} = {}
+        
+        this.board.living_cells.forEach(cell => {
+            this.calc_neigberhood(cell)            
+        })
 
-        board.living_cells.forEach(cell => {
+        const boardAfter = new Board()
+        boardAfter.living_cells = this.board.living_cells.filter(cell => cell.next_state).concat(
+            this.board.dead_cells.filter(cell => cell.living_neigbers === 3))
 
-            this.offset.forEach(neighborOffset => {
+        this.board = boardAfter
+    }
+    
+    calc_neigberhood(cell: Cell){
+        const neigberhood: Cell[] = []
 
-                //when reaching the board limits
-                if ((cell.key.x == 0 && neighborOffset[0] < 0) || (cell.key.x == 0 && neighborOffset[1] < 0) ||
-                    (cell.key.x == this.gameResolution.x && neighborOffset[0] > 0 || cell.key.y == this.gameResolution.y && neighborOffset[1] > 0)){
+        for (const neighborOffset of this.offset) {
+    
+            //when reaching the board limits (boardType === 'flat')
+            if ((cell.coordinate.x == 0 && neighborOffset[0] < 0) || (cell.coordinate.x == 0 && neighborOffset[1] < 0) ||
+                (cell.coordinate.x == this.gameResolution.x && neighborOffset[0] > 0 || cell.coordinate.y == this.gameResolution.y && neighborOffset[1] > 0)){
+                continue
+            }
+    
+            const neighbor_coordinate: Coordinate = {x: cell.coordinate.x + neighborOffset[0], y: cell.coordinate.y + neighborOffset[1]}
+            
+            if (this.board.living_cells.map(c => c.coordinate).includes(neighbor_coordinate)) {
+                const neighbor_cell = this.board.living_cells.find(c => coordinateEq(c.coordinate, neighbor_coordinate))!
+    
+                if (neighbor_cell.is_dirty) {
                     continue
                 }
+    
+                neigberhood.push(neighbor_cell)
+                
+                // is dirty
+                this.board.living_cells = this.board.living_cells.filter(c => !coordinateEq(c.coordinate, neighbor_coordinate))
+    
+    
+            } else {
+                const neighbor_cell = this.board.dead_cells.find(c => coordinateEq(c.coordinate, neighbor_coordinate))!
+                neighbor_cell.living_neigbers++
+            }
+        }
+    
+        cell.is_dirty = true
+        if (neigberhood.length >= 2 && neigberhood.length <= 3) {
+            cell.next_state = true
+        } else {
+            cell.next_state = false
+        }
 
-                const next_cell: Coordinate = {x: cell.key.x + neighborOffset[0], y: cell.key.y + neighborOffset[1]}
-                if (board.has(next_cell))) {
-                    neigberhood.push(next_cell)
-                    board.remove(next_cell)
-                } else {
-                    // insert dead neighbor to birthCandidates with count 1
-                    // or if exists, ++
-                }
-            
-            
-            })
-
-            calc_neigberhood()
-            const after = 
-
-            return cell
-        })    
-
-    calc_neigberhood(neigberhood: Coordinate[]){
-        //take max x or y and kill
+        neigberhood.filter(neigh => !neigh.is_dirty).forEach(c => this.calc_neigberhood(c))
     }
-
-
-    }
-
 }
 
 export { Board, Game }
