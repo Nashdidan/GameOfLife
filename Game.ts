@@ -3,13 +3,12 @@ type Boards  = Set<{key: Coordinate, value: number}>
 
 type Coordinate = {x: number, y: number}
 
-class Board{
-    living_cells: Cell[] = []
-    dead_cells: Cell[] = []
-
+export type Board = {
+    living_cells: Cell[]
+    dead_cells: Cell[]
 }
 
-class Cell{
+class Cell {
     is_alive: Boolean = true
     next_state: boolean
     is_dirty: Boolean = false
@@ -33,7 +32,7 @@ class Game {
             this.calc_neigberhood(cell)            
         })
 
-        const boardAfter = new Board()
+        const boardAfter: Board = {living_cells: [], dead_cells: []}
         boardAfter.living_cells = this.board.living_cells.filter(cell => cell.next_state).concat(
             this.board.dead_cells.filter(cell => cell.living_neigbers === 3))
 
@@ -64,8 +63,6 @@ class Game {
                 
                 // is dirty
                 this.board.living_cells = this.board.living_cells.filter(c => !coordinateEq(c.coordinate, neighbor_coordinate))
-    
-    
             } else {
                 const neighbor_cell = this.board.dead_cells.find(c => coordinateEq(c.coordinate, neighbor_coordinate))!
                 neighbor_cell.living_neigbers++
@@ -83,4 +80,4 @@ class Game {
     }
 }
 
-export { Board, Game }
+export { Game }
