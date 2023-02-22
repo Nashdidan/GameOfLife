@@ -8,7 +8,7 @@ export type Board = {
 }
 
 class Cell {
-    is_alive: Boolean = true
+    is_alive: Boolean = true //depricated
     next_state: boolean
     is_dirty: Boolean = false
     coordinate: Coordinate
@@ -30,7 +30,7 @@ class Game {
         this.board.living_cells.forEach(cell => {
             this.calc_neigberhood(cell, this.board)            
         })
-        console.log("dead cells neighbors ---> ", this.board.dead_cells)
+        // console.log("dead cells neighbors ---> ", this.board.dead_cells)
         const boardAfter: Board = {living_cells: [], dead_cells: []}
         boardAfter.living_cells = this.board.living_cells.filter(cell => cell.next_state).concat(
             this.board.dead_cells.filter(cell => cell.living_neigbers === 3))
@@ -38,11 +38,20 @@ class Game {
             this.board.dead_cells.filter(cell => cell.living_neigbers != 3)
         )
         this.board = boardAfter
+        this.board.dead_cells.map(cell => {
+            cell.is_dirty = false
+            cell.living_neigbers = 0
+        })
+        this.board.living_cells.map(cell => {
+            cell.is_dirty = false
+            cell.living_neigbers = 0
+        })
+        console.log("this board ----> ", this.board)
     }
     
     calc_neigberhood(cell: Cell, board: Board){
         const neigberhood: Cell[] = []
-        console.log("living cells ---> ", cell)
+        // console.log("living cells ---> ", cell)
         for (const neighborOffset of this.offset) {
     
             const neighbor_coordinate: Coordinate = {x: cell.coordinate.x + neighborOffset[0], y: cell.coordinate.y + neighborOffset[1]}
