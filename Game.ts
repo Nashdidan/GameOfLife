@@ -1,4 +1,3 @@
-
 type Boards  = Set<{key: Coordinate, value: number}>
 
 type Coordinate = {x: number, y: number}
@@ -31,17 +30,19 @@ class Game {
         this.board.living_cells.forEach(cell => {
             this.calc_neigberhood(cell, this.board)            
         })
-
+        console.log("dead cells neighbors ---> ", this.board.dead_cells)
         const boardAfter: Board = {living_cells: [], dead_cells: []}
         boardAfter.living_cells = this.board.living_cells.filter(cell => cell.next_state).concat(
             this.board.dead_cells.filter(cell => cell.living_neigbers === 3))
-
+        boardAfter.dead_cells = this.board.living_cells.filter(cell => !cell.next_state).concat(
+            this.board.dead_cells.filter(cell => cell.living_neigbers != 3)
+        )
         this.board = boardAfter
     }
     
     calc_neigberhood(cell: Cell, board: Board){
         const neigberhood: Cell[] = []
-
+        console.log("living cells ---> ", cell)
         for (const neighborOffset of this.offset) {
     
             const neighbor_coordinate: Coordinate = {x: cell.coordinate.x + neighborOffset[0], y: cell.coordinate.y + neighborOffset[1]}
@@ -53,17 +54,20 @@ class Game {
             }
     
             
-            if (board.living_cells.map(c => c.coordinate).includes(neighbor_coordinate)) {
+            if (board.living_cells.some(c => coordinateEq( c.coordinate, neighbor_coordinate))) {
                 const neighbor_cell = board.living_cells.find(c => coordinateEq(c.coordinate, neighbor_coordinate))!
-    
-                if (neighbor_cell.is_dirty) {
+                if(neighbor_cell == undefined)
+                {
                     continue
                 }
+                // if (neighbor_cell.is_dirty) {
+                //     continue
+                // }
     
                 neigberhood.push(neighbor_cell)
                 
                 // is dirty
-                board.living_cells = board.living_cells.filter(c => !coordinateEq(c.coordinate, neighbor_coordinate))
+                // board.living_cells = board.living_cells.filter(c => !coordinateEq(c.coordinate, neighbor_coordinate))
             } else {
                 const neighbor_cell = board.dead_cells.find(c => coordinateEq(c.coordinate, neighbor_coordinate))!
                 if (neighbor_cell != undefined)
@@ -78,7 +82,7 @@ class Game {
             cell.next_state = false
         }
 
-        neigberhood.filter(neigh => !neigh.is_dirty).forEach(c => this.calc_neigberhood(c, board))
+        // neigberhood.filter(neigh => !neigh.is_dirty).forEach(c => this.calc_neigberhood(c, board))
     }
 }
 
